@@ -376,12 +376,11 @@ def main():
     
     RENDER_URL = os.getenv('RENDER_EXTERNAL_URL')
     
-    if RENDER_URL:
-        print(f"🔗 Running on Render with webhook")
-        app.run_webhook(listen="0.0.0.0", port=PORT, url_path="webhook", webhook_url=f"{RENDER_URL}/webhook")
-    else:
-        print("💻 Running locally with polling")
-        app.run_polling()
-
-if __name__ == '__main__':
-    main()
+   # FIXED: Using webhook with proper package
+print(f"🔗 Running on Render with webhook")
+app.run_webhook(
+    listen="0.0.0.0", 
+    port=int(os.getenv('PORT', 8080)), 
+    url_path="webhook", 
+    webhook_url=f"{os.getenv('RENDER_EXTERNAL_URL')}/webhook"
+)
