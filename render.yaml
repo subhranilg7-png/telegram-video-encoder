@@ -1,0 +1,51 @@
+# Render Blueprint Configuration
+# This file tells Render exactly how to deploy your bot
+
+services:
+  # Web service for the Telegram bot
+  - type: web
+    name: telegram-video-encoder
+    env: docker
+    plan: free
+    region: oregon  # Choose: oregon, ohio, frankfurt, singapore
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    
+    # Health check - Render needs this to know your bot is alive
+    healthCheckPath: /health
+    
+    # Auto-deploy when you push to GitHub
+    autoDeploy: true
+    
+    # Environment variables
+    envVars:
+      # Your Telegram bot token - MUST be set in Render dashboard
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false  # Don't store in git, set manually in Render
+      
+      # Port for health check server
+      - key: PORT
+        value: 8080
+      
+      # Python optimization
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      
+      # Render automatically sets this
+      - key: RENDER
+        value: "true"
+    
+    # Persistent disk for video files
+    disk:
+      name: temp-storage
+      mountPath: /tmp
+      sizeGB: 10  # Enough for 1.5GB videos
+    
+    # Resource limits (for paid plans)
+    # Uncomment if you upgrade from free tier
+    # scaling:
+    #   minInstances: 0
+    #   maxInstances: 1
+    #   targetMemoryPercent: 80
+    #   targetCPUPercent: 80
